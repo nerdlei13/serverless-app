@@ -1,24 +1,22 @@
-import * as uuid from 'uuid';
+import * as uuid from "uuid";
 import handler from "./libs/handler-lib";
 import dynamoDb from "./libs/dynamodb-lib";
 
-//const dynamoDB = new AWS.DynamoDB.DocumentClient();
-
 export const main = handler(async (event, context) => {
-    
-    const data = JSON.parse(event.body);
+  const data = JSON.parse(event.body);
+  const params = {
+    TableName: process.env.tableName,
+    Item: {
+      // The attributes of the item to be created
+      userId: "69", // The id of the author
+      noteId: uuid.v1(), // A unique uuid
+      content: data.content, // Parsed from request body
+      attachment: data.attachment, // Parsed from request body
+      createdAt: Date.now(), // Current Unix timestamp
+    },
+  };
 
-    const params ={
-        TableName: process.env.tablename,
-        Item: {
-            userId: "69",
-            noteId: uuid.v1(),
-            content: data.content,
-            attachment: data.attachment,
-            createdAt: Date.now()
-        },
-    };
+  await dynamoDb.put(params);
 
-   await dynamoDb.put(params);
-   return params.Item;
+  return params.Item;
 });
