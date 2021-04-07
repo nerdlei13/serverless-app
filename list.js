@@ -4,16 +4,13 @@ import dynamoDb from "./libs/dynamodb-lib";
 export const main = handler(async (event, context) => {
     const params = {
         TableName: process.env.tableName,
-        Key:{
-            userId: "69",
-            noteId: event.pathParameters.id,
+        KeyConditionExpression: "userId = :userId",
+        ExpressionAttributeValues: {
+            ":userId": "69",
         },
     };
 
-    const result = await dynamoDb.get(params);
-    if(!result.Item){
-        throw new Error("Item not found.");
-    }
+    const result = await dynamoDb.query(params);
 
-    return result.Item;
+    return result.Items;
 });
